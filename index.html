@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <title>POE/角色/天賦/裝備/分析</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <script src="js/jquery-1.11.1.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/tree.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/lang.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/poe.js" type="text/javascript" charset="utf-8"></script>
+
+    <script src="js/bootstrap-3.1.1/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="js/bootstrap-3.1.1/css/bootstrap.min.css">
+</head>
+
+<body class="container">
+<br/>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form role="form">
+            <div class="form-group">
+                <label for="poePoint">天賦樹</label>
+                <input type="text" class="form-control" id="poePoint" placeholder=""
+                       value="AAAAAgEAAdwCcQPGBLMFLQn2C2EMXxJpFCAUTRRSFHEXHBhqGJEZLhv6HKckiyWtJd8nLyfVJ-0o-i7_OuE8LT0PPfxBh0WdR35N41BHUFBTUlOlVbVXDVgHWGNfP2BLYSFlTWh0bBZxeXTteA14L3loeu98u3zlffWCx4M4hNmE74cZjM-PRpitmuCboZ2uns2iAKIPpBmkrKZXpwinMLc-uJO8n76KwQTEFcRYxPbFisauxtjSIdi92WHa3eLq45_r7u8O73zwH_Iv8kX2SPno_Ev9C_4K_o8=">
+            </div>
+            <div class="form-group">
+                <label for="poeItem">裝備</label>
+                <input type="text" class="form-control" id="poeItem" placeholder=""
+                       value="87等正火健檢用v3.htm">
+            </div>
+            <div class="form-group">
+                <label for="poeLevel">等級</label>
+                <input type="text" class="form-control" id="poeLevel" placeholder=""
+                       value="87">
+            </div>
+            <button type="button" class="btn btn-default" id="Submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab"
+                                                      data-toggle="tab">總合</a></li>
+            <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">來自天賦</a>
+            </li>
+            <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">來自裝備</a>
+            </li>
+            <li role="presentation"><a href="#base" aria-controls="base" role="tab" data-toggle="tab">來自角色</a>
+            </li>
+            <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">正火傷害計算</a>
+            </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="home">
+                <div id="div0" class="panel-body poeDiv"></div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="profile">
+                <div id="div1" class="panel-body poeDiv"></div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="messages">
+                <div id="div2" class="panel-body poeDiv"></div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="base">
+                <div id="div3" class="panel-body poeDiv"></div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="settings">...</div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
