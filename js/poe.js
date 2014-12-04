@@ -1,5 +1,86 @@
 $(function () {
 
+    //讀取設定
+    $.ajax({
+        url: "passive.properties",
+        async: false,
+        dataType: 'text',
+        success: function (data) {
+            var datas = data.split("\n");
+            var poePoint = $("#poePoint")[0];
+            var idx = 0;
+            for (var i = 0; i < datas.length; i++) {
+
+                if (datas[i].indexOf("#") == 0) {
+                    continue;
+                }
+
+                var items = datas[i].split("=");
+                if (items.length >= 2) {
+
+                    if (idx == 0) {
+                        $("#poeLevel").val(items[1].split(",")[0]);
+                    }
+                    var passive = datas[i].substring(datas[i].indexOf("=") + 1, datas[i].length);
+                    poePoint.options[idx++] = new Option(items[0], passive);
+                }
+            }
+        }
+    });
+
+    //v1.3
+    $.ajax({
+        url: "passive.v1.3.properties",
+        async: false,
+        dataType: 'text',
+        success: function (data) {
+            var datas = data.split("\n");
+            var poePoint = $("#poePoint")[0];
+            for (var i = 0; i < datas.length; i++) {
+
+                if (datas[i].indexOf("#") == 0) {
+                    continue;
+                }
+
+                var items = datas[i].split("=");
+                if (items.length >= 2) {
+                    var passive = datas[i].substring(datas[i].indexOf("=") + 1, datas[i].length);
+                    poePoint.options[poePoint.options.length] = new Option(items[0] + "(v1.3)", passive);
+                }
+            }
+        }
+    });
+
+
+
+    $.ajax({
+        url: "inventory.properties",
+        async: false,
+        dataType: 'text',
+        success: function (data) {
+            var datas = data.split("\n");
+            var poeItem = $("#poeItem")[0];
+            var idx = 0;
+            for (var i = 0; i < datas.length; i++) {
+
+                if (datas[i].indexOf("#") == 0) {
+                    continue;
+                }
+
+                var items = datas[i].split("=");
+                if (items.length == 2) {
+                    poeItem.options[idx++] = new Option(items[0], items[1]);
+                }
+            }
+        }
+    });
+
+
+    $("#poePoint").change(function () {
+        $("#poeLevel").val($(this).val().split(",")[0]);
+    });
+
+
     $("#Submit").click(function () {
 
         $(".poeDiv").html("");
@@ -7,12 +88,15 @@ $(function () {
 
         //天賦分析
         var t = $("#poePoint").val();
+        var isVer13 = $("#poePoint>option:selected").html().indexOf("(v1.3)")!=-1;
+        var passiveSkillTreeData = getPassive(isVer13);
 
         if (t.indexOf("/") != -1) {
             t = t.substring(t.lastIndexOf("/") + 1, t.length);
         }
 
         t = t.replace(/-/g, "+").replace(/_/g, "/");
+
         t = new base64().decode(t);
 
         var s = new ByteDecoder();
@@ -64,7 +148,7 @@ $(function () {
         var equipmentSkills = [];
         //裝備分析
         $.ajax({
-            url: $("#poeItem").val(),
+            url: "inventory/" + $("#poeItem").val(),
             async: false,
             dataType: 'text',
             success: function (htmldata) {
@@ -74,14 +158,13 @@ $(function () {
                 var data = null;
                 for (var i = 0; i < lines.length; i++) {
                     if (lines[i].indexOf("PoE/Item/DeferredItemRenderer") != -1) {
-                        var itemLine = ""+$.trim(lines[i]);
-                        itemLine = itemLine.substring(65,itemLine.length);
-                        itemLine = itemLine.substring(0,itemLine.length-14);
-                        htmldata = $.parseJSON("{\"items\":["+itemLine+"]}");
+                        var itemLine = "" + $.trim(lines[i]);
+                        itemLine = itemLine.substring(65, itemLine.length);
+                        itemLine = itemLine.substring(0, itemLine.length - 14);
+                        htmldata = $.parseJSON("{\"items\":[" + itemLine + "]}");
                     }
                 }
 
-                
 
                 if (htmldata) {
                     for (var i = 0; i < htmldata.items.length; i++) {
@@ -110,6 +193,15 @@ $(function () {
                                 equipmentSkills.push(explicitMods[j]);
                             }
                         }
+
+                        //大師
+                        var craftedMods = item.craftedMods;
+                        if (craftedMods) {
+                            for (var j = 0; j < craftedMods.length; j++) {
+                                equipmentSkills.push(craftedMods[j]);
+                            }
+                        }
+
 
                         //基底屬性
                         var properties = item.properties;
@@ -186,9 +278,14 @@ $(function () {
                 //每 1 點智慧 +0.5 最大魔力, 增加 0.2% 能量護盾                  
                 var div = $("#div" + k);
 
+                var addall = parseInt(calValues(sumMap.get("N 全能力")));
+                if (isNaN(addall)) {
+                    addall = 0;
+                }
+
                 //生命
-                var plife = calValues(sumMap.get("N 力量"));
-                plife = (parseInt(plife) * 0.5);
+                var plife = parseInt(calValues(sumMap.get("N 力量"))) + addall;
+                plife = (plife * 0.5);
                 var olife = parseInt(calValues(sumMap.get("N 最大生命")).replace("+", ""));
                 var olifep = parseInt(calValues(sumMap.get("增加 N 最大生命(%)")).replace("%", ""));
                 var mylife = Math.round((plife + olife) * (1 + olifep / 100));
@@ -196,19 +293,19 @@ $(function () {
                 div.append("<div class='col-md-8'>" + mylife + "</div>");
 
                 //魔力
-                var intelligence = calValues(sumMap.get("N 智慧"));
-                intelligence = (parseInt(intelligence) * 0.5);
+                var intelligence = parseInt(calValues(sumMap.get("N 智慧"))) + addall;
+                intelligence = (intelligence * 0.5);
                 var intelligence = Math.round(intelligence + parseInt(calValues(sumMap.get("N 最大魔力")).replace("+", "")));
                 div.append("<div class='col-md-4'>魔力</div>");
                 div.append("<div class='col-md-8'>" + intelligence + "</div>");
+                var myMana = intelligence;
 
                 //護盾
-                intelligence = calValues(sumMap.get("N 智慧"));
-                intelligence = (parseInt(intelligence) * 0.2);
+                intelligence = parseInt(calValues(sumMap.get("N 智慧"))) + addall;
+                var pIntelligence = (intelligence * 0.002);
                 var bIntelligence = parseInt(calValues(sumMap.get("N 最大能量護盾")).replace("+", ""));
-                var pIntelligence = intelligence + parseInt(calValues(sumMap.get("增加 N 護甲與能量護盾(%)")).replace("%", ""));
-
-                intelligence = Math.round(bIntelligence * (1 + pIntelligence / 100));
+                //var pIntelligence = intelligence + parseInt(calValues(sumMap.get("增加 N 護甲與能量護盾(%)")).replace("%", ""));
+                intelligence = Math.round(bIntelligence * (1 + pIntelligence));
                 div.append("<div class='col-md-4'>護盾</div>");
                 div.append("<div class='col-md-8'>" + intelligence + "</div>");
 
@@ -219,23 +316,39 @@ $(function () {
                 div.append("<div class='col-md-4'>每秒生命回復</div>");
                 div.append("<div class='col-md-8'>" + lifeRevert + "</div>");
 
+                //每秒回魔力
+                var pMagicRevert = parseFloat(calValues(sumMap.get("增加 N 魔力回復速度(%)")).replace("%", ""));
+                var magicRevert = Math.round((myMana * 0.0175 * (pMagicRevert / 100)))
+                div.append("<div class='col-md-4'>每秒魔力回復</div>");
+                div.append("<div class='col-md-8'>" + magicRevert + "</div>");
+
                 //抗性
                 var keys = sumMap.keys();
 
-                var fastness = ['冰冷', '火焰', '閃電'];
+                var fastness = ['火焰', '冰冷', '閃電'];
                 for (var f = 0; f < fastness.length; f++) {
                     var total = 0;
+                    var collection = [];
                     for (var i = 0; i < keys.length; i++) {
+
+                        if (keys[i].indexOf("最大" + fastness[f] + "抗性") != -1 || keys[i].indexOf("瀕血時增加") != -1) {
+                            continue;
+                        }
+
                         if (keys[i].indexOf(fastness[f]) != -1 && keys[i].indexOf("抗性") != -1) {
                             total += parseInt(calValues(sumMap.get(keys[i])).replace("%", ""));
+
+                            collection.push(sumMap.get(keys[i]));
                         }
                     }
                     total += parseInt(calValues(sumMap.get("N 全部元素抗性(%)")).replace("%", ""));
                     div.append("<div class='col-md-4'>" + fastness[f] + "抗性</div>");
+                    //div.append("<div class='col-md-8'>" + total + "("+collection.join(",")+")</div>");
                     div.append("<div class='col-md-8'>" + total + "</div>");
                 }
+
+                div.append("<div class='col-md-12'><hr /></div>")
             }
-            div.append("<div class='col-md-12'><hr /></div>")
 
             //總合
             var div1 = $("#div" + k);
@@ -247,7 +360,6 @@ $(function () {
                 div1.append("<div class='col-md-8'>" + sumVal + "</div>");
             }
 
-            div1.append("<hr/>")
             for (var i = 0; i < others.length; i++) {
                 div1.append("<div class='col-md-12'>" + others[i] + "</div>");
             }
@@ -263,6 +375,50 @@ $(function () {
 
 });
 
+var passiveSkillTreeData;
+var passiveSkillTreeData13;
+
+function getPassive(isVer13) {
+    
+
+    if(passiveSkillTreeData==undefined){
+        //讀取設定
+        $.ajax({
+            url: "js/tree.js",
+            async: false,
+            dataType: 'json',
+            success: function (data) {
+                passiveSkillTreeData = data;
+            }
+        });
+    }
+
+    if(passiveSkillTreeData13==undefined){
+        //讀取設定
+        $.ajax({
+            url: "js/tree1.3.js",
+            async: false,
+            dataType: 'json',
+            success: function (data) {
+                passiveSkillTreeData13 = data;
+            }
+        });    
+    }
+    
+    return isVer13?passiveSkillTreeData13:passiveSkillTreeData;
+
+}
+
+function openPasive() {
+    var poePoint = $("#poePoint").val();
+    var vals = poePoint.split(",");
+    window.open(vals[1]);
+}
+
+function openInventory() {
+    var poeItem = $("#poeItem").val();
+    window.open("inventory/" + poeItem);
+}
 
 function maphandle(sumMap, name, val) {
 

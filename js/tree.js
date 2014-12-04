@@ -1,4 +1,4 @@
-var passiveSkillTreeData={"characterData":
+{"characterData":
 
 {"1":{"base_str":32,"base_dex":14,"base_int":14},
 "3":{"base_str":14,"base_dex":14,"base_int":32},
