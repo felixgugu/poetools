@@ -146,6 +146,7 @@ $(function () {
 
 
         var equipmentSkills = [];
+        var maxRequirements = [];
         //裝備分析
         $.ajax({
             url: "inventory/" + $("#poeItem").val(),
@@ -202,6 +203,14 @@ $(function () {
                             }
                         }
 
+                        //裝備需求
+                        var requirements = item.requirements;
+                        if (requirements) {
+                            for (var j = 0; j < requirements.length; j++) {
+                                maxRequirements.push(requirements[j].name+"需求@"+requirements[j].values[0][0]);
+                            }
+                        }
+                        
 
                         //基底屬性
                         var properties = item.properties;
@@ -346,6 +355,48 @@ $(function () {
                     //div.append("<div class='col-md-8'>" + total + "("+collection.join(",")+")</div>");
                     div.append("<div class='col-md-8'>" + total + "</div>");
                 }
+                
+                //裝備需求
+                var maxP=0;
+                var maxI=0;
+                var maxV=0;
+                var maxL=0;
+                for(var m=0;m<maxRequirements.length;m++){
+                
+                    var tmps=maxRequirements[m].split("@");
+                    
+                    if(tmps[0]=="力量需求" && parseInt(tmps[1]) > maxP){
+                        maxP=parseInt(tmps[1]);
+                    }
+                    
+                    if(tmps[0]=="智慧需求" && parseInt(tmps[1]) > maxI){
+                        maxI=parseInt(tmps[1]);
+                    }
+                    
+                    if(tmps[0]=="敏捷需求" && parseInt(tmps[1]) > maxV){
+                        maxV=parseInt(tmps[1]);
+                    }
+                    
+                    if(tmps[0]=="等級需求" && parseInt(tmps[1]) > maxL){
+                        maxL=parseInt(tmps[1]);
+                    }
+                    
+                }
+                
+                div.append("<div class='col-md-12'><hr /></div>")
+                
+                div.append("<div class='col-md-4'>裝備等級需求</div>");
+                div.append("<div class='col-md-8'>" + maxL + "</div>");                
+                
+                div.append("<div class='col-md-4'>裝備力量需求</div>");
+                div.append("<div class='col-md-8'>" + maxP + "</div>");                
+                
+                div.append("<div class='col-md-4'>裝備智慧需求</div>");
+                div.append("<div class='col-md-8'>" + maxI + "</div>");                
+                
+                div.append("<div class='col-md-4'>裝備敏捷需求</div>");
+                div.append("<div class='col-md-8'>" + maxV + "</div>");                
+                
 
                 div.append("<div class='col-md-12'><hr /></div>")
             }
