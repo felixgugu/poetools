@@ -291,18 +291,27 @@ $(function () {
                 if (isNaN(addall)) {
                     addall = 0;
                 }
+                
+                var n1 = parseInt(calValues(sumMap.get("N 力量和智慧")).replace("+", ""));
+                if(n1==undefined || isNaN(n1)){n1=0;}
+                
+                var n2 = parseInt(calValues(sumMap.get("N 力量和敏捷")).replace("+", ""));
+                if(n2==undefined || isNaN(n2)){n2=0;}
+                
+                var n3 = parseInt(calValues(sumMap.get("N 敏捷和智慧")).replace("+", ""));
+                if(n3==undefined || isNaN(n3)){n3=0;}
 
                 //生命
-                var plife = parseInt(calValues(sumMap.get("N 力量"))) + addall;
+                var plife = parseFloat(calValues(sumMap.get("N 力量"))) + addall + n1;
                 plife = (plife * 0.5);
-                var olife = parseInt(calValues(sumMap.get("N 最大生命")).replace("+", ""));
-                var olifep = parseInt(calValues(sumMap.get("增加 N 最大生命(%)")).replace("%", ""));
-                var mylife = Math.round((plife + olife) * (1 + olifep / 100));
+                var olife = parseFloat(calValues(sumMap.get("N 最大生命")).replace("+", ""));
+                var olifep = parseFloat(calValues(sumMap.get("增加 N 最大生命(%)")).replace("%", ""));
+                var mylife = Math.round((plife + olife) * (1 + (olifep / 100)));
                 div.append("<div class='col-md-4'>生命</div>");
                 div.append("<div class='col-md-8'>" + mylife + "</div>");
 
                 //魔力
-                var intelligence = parseInt(calValues(sumMap.get("N 智慧"))) + addall;
+                var intelligence = parseInt(calValues(sumMap.get("N 智慧"))) + addall+n1+n3;
                 intelligence = (intelligence * 0.5);
                 var intelligence = Math.round(intelligence + parseInt(calValues(sumMap.get("N 最大魔力")).replace("+", "")));
                 div.append("<div class='col-md-4'>魔力</div>");
@@ -310,7 +319,7 @@ $(function () {
                 var myMana = intelligence;
 
                 //護盾
-                intelligence = parseInt(calValues(sumMap.get("N 智慧"))) + addall;
+                intelligence = parseInt(calValues(sumMap.get("N 智慧"))) + addall+n1+n3;;
                 var pIntelligence = (intelligence * 0.002);
                 var bIntelligence = parseInt(calValues(sumMap.get("N 最大能量護盾")).replace("+", ""));
                 //var pIntelligence = intelligence + parseInt(calValues(sumMap.get("增加 N 護甲與能量護盾(%)")).replace("%", ""));
@@ -357,6 +366,12 @@ $(function () {
                 }
                 
                 //裝備需求
+
+                
+                var baseP = parseInt(calValues(sumMap.get("N 力量")).replace("+", ""))+n1+n2+addall;
+                var baseI = parseInt(calValues(sumMap.get("N 智慧")).replace("+", ""))+n1+n3+addall;
+                var baseV = parseInt(calValues(sumMap.get("N 敏捷")).replace("+", ""))+n2+n3+addall;
+                
                 var maxP=0;
                 var maxI=0;
                 var maxV=0;
@@ -385,17 +400,17 @@ $(function () {
                 
                 div.append("<div class='col-md-12'><hr /></div>")
                 
-                div.append("<div class='col-md-4'>裝備等級需求</div>");
+                div.append("<div class='col-md-4'>等級需求</div>");
                 div.append("<div class='col-md-8'>" + maxL + "</div>");                
                 
-                div.append("<div class='col-md-4'>裝備力量需求</div>");
-                div.append("<div class='col-md-8'>" + maxP + "</div>");                
+                div.append("<div class='col-md-4'>力量 基礎/需求</div>");
+                div.append("<div class='col-md-8' style='color:"+(baseP<maxP?'red':'')+"'>" + baseP + "/"+maxP+"("+(baseP-maxP)+")</div>");                
                 
-                div.append("<div class='col-md-4'>裝備智慧需求</div>");
-                div.append("<div class='col-md-8'>" + maxI + "</div>");                
+                div.append("<div class='col-md-4'>智慧 基礎/需求</div>");
+                div.append("<div class='col-md-8' style='color:"+(baseI<maxI?'red':'')+"'>" + baseI + "/"+maxI+"("+(baseI-maxI)+")</div>");                
                 
-                div.append("<div class='col-md-4'>裝備敏捷需求</div>");
-                div.append("<div class='col-md-8'>" + maxV + "</div>");                
+                div.append("<div class='col-md-4'>敏捷 基礎/需求</div>");
+                div.append("<div class='col-md-8' style='color:"+(baseV<maxV?'red':'')+"'>" + baseV + "/"+maxV+"("+(baseV-maxV)+")</div>");                
                 
 
                 div.append("<div class='col-md-12'><hr /></div>")
